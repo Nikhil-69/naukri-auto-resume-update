@@ -18,7 +18,6 @@ jobs:
     timeout-minutes: 15
     env:
       HEADLESS: 'false'
-      BROWSER_EXECUTABLE_PATH: ${{ steps.chrome.outputs.chrome-path }}
     steps:
       - uses: actions/checkout@v4
 
@@ -52,4 +51,6 @@ jobs:
           chmod 600 state/naukri-storage-state.json resumes/resume.pdf
 
       - name: Upload resume
+        env:
+          BROWSER_EXECUTABLE_PATH: ${{ steps.chrome.outputs.chrome-path }}
         run: xvfb-run -a npm run update
