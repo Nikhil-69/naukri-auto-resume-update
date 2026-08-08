@@ -1,0 +1,15 @@
+{
+  "name": "naukri-auto-resume-update",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Update a Naukri profile resume with a saved Playwright session",
+  "scripts": {
+    "login": "node src/login.js",
+    "update": "node src/update-resume.js",
+    "update:server": "xvfb-run -a node src/update-resume.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "playwright": "^1.53.0"
+  }
+}

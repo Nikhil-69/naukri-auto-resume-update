@@ -1,0 +1,7 @@
+node_modules/
+.env
+state/
+data/
+resumes/*
+!resumes/.gitkeep
+*.log
