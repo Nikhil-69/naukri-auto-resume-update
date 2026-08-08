@@ -4,7 +4,7 @@ const { chromium } = require('playwright');
 const { rootDir, statePath, resumePath, headless, browserChannel, requireResume, requireState } = require('./config');
 
 const profileUrl = 'https://www.naukri.com/mnjuser/profile';
-const uploadUrlPattern = /(resume|cv|upload)/i;
+const uploadUrlPattern = /(advresume|resume|cv)/i;
 
 async function assertLoggedIn(page) {
   if (page.url().includes('nlogin') || await page.locator('a#login_Layer, a[title="Jobseeker Login"]').first().isVisible().catch(() => false)) {
@@ -13,16 +13,22 @@ async function assertLoggedIn(page) {
 }
 
 async function waitForUpload(page) {
-  return Promise.race([
-    page.waitForResponse(response => {
-      const request = response.request();
-      return uploadUrlPattern.test(response.url())
-        && ['POST', 'PUT', 'PATCH'].includes(request.method())
-        && response.status() >= 200
-        && response.status() < 300;
-    }, { timeout: 60000 }),
-    page.getByText(/resume.*(updated|uploaded)|successfully.*resume/i).first().waitFor({ state: 'visible', timeout: 60000 }),
-  ]);
+  return page.waitForResponse(response => {
+    const request = response.request();
+    return uploadUrlPattern.test(response.url())
+      && ['POST', 'PUT', 'PATCH'].includes(request.method())
+      && response.status() >= 200
+      && response.status() < 300;
+  }, { timeout: 60000 });
+}
+
+async function profileUpdateStatus(page) {
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await page.waitForTimeout(3000);
+  return page.evaluate(() => (document.body?.innerText || '')
+    .split(/\n+/)
+    .map(line => line.trim())
+    .find(line => /^Profile last updated/i.test(line)) || null);
 }
 
 async function main() {
@@ -40,15 +46,17 @@ async function main() {
       throw new Error('Naukri blocked this browser request. Use HEADLESS=false with npm run update:server so Chrome runs under Xvfb.');
     }
 
-    const resumeInput = page.locator('input[type="file"]').first();
+    const resumeInput = page.locator('#attachCV');
     if (!(await resumeInput.count())) {
       throw new Error('Naukri resume file input was not found. Run with HEADLESS=false to inspect the current profile page.');
     }
 
-    const uploadComplete = waitForUpload(page);
+    const uploadResponse = waitForUpload(page);
     await resumeInput.setInputFiles(resumePath);
-    await uploadComplete;
-    console.log(`Resume upload completed: ${resumePath}`);
+    const response = await uploadResponse;
+    const status = await profileUpdateStatus(page);
+    console.log(`Resume upload accepted by Naukri (HTTP ${response.status()}): ${resumePath}`);
+    console.log(status || 'Profile reloaded after upload; Naukri did not expose a profile timestamp.');
   } catch (error) {
     const dataDir = path.join(rootDir, 'data');
     fs.mkdirSync(dataDir, { recursive: true });
