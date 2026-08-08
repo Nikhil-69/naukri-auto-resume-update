@@ -54,4 +54,4 @@ The command exits non-zero when the resume is missing, the login state expired, 
 
 ## GitHub Actions
 
-The public repository includes a scheduled workflow that runs daily at 09:30, 13:30, and 17:30 IST and can also be started manually. It needs these repository secrets, which must never be committed: `NAUKRI_STATE_B64`, `NAUKRI_RESUME_B64_1`, `NAUKRI_RESUME_B64_2`, and `NAUKRI_RESUME_B64_3`.
+The public repository includes a manually dispatched workflow. GitHub-hosted runners may be blocked by Naukri, so use a browser host that is not a shared datacenter IP for scheduled updates. It needs these repository secrets, which must never be committed: `NAUKRI_STATE_B64`, `NAUKRI_RESUME_B64_1`, `NAUKRI_RESUME_B64_2`, and `NAUKRI_RESUME_B64_3`.

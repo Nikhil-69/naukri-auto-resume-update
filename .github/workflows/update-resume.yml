@@ -2,8 +2,6 @@ name: Update Naukri resume
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '0 4,8,12 * * *'
 
 permissions:
   contents: read
