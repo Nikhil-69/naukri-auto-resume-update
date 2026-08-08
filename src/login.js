@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { chromium } = require('playwright');
-const { statePath, browserChannel } = require('./config');
+const { statePath, browserChannel, browserExecutablePath } = require('./config');
 
 async function isLoggedIn(page) {
   const loginLink = page.locator('a#login_Layer, a[title="Jobseeker Login"]').first();
@@ -13,7 +13,11 @@ async function isLoggedIn(page) {
 }
 
 async function main() {
-  const browser = await chromium.launch({ headless: false, channel: browserChannel, slowMo: 50 });
+  const browser = await chromium.launch({
+    headless: false,
+    ...(browserExecutablePath ? { executablePath: browserExecutablePath } : { channel: browserChannel }),
+    slowMo: 50,
+  });
   const context = await browser.newContext();
   const page = await context.newPage();
 

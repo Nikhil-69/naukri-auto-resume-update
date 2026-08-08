@@ -1,0 +1,55 @@
+name: Update Naukri resume
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 4,8,12 * * *'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: naukri-resume-update
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      HEADLESS: 'false'
+      BROWSER_EXECUTABLE_PATH: ${{ steps.chrome.outputs.chrome-path }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - id: chrome
+        uses: browser-actions/setup-chrome@v1
+        with:
+          chrome-version: stable
+
+      - run: npm ci
+
+      - name: Restore private Naukri files
+        env:
+          NAUKRI_STATE_B64: ${{ secrets.NAUKRI_STATE_B64 }}
+          NAUKRI_RESUME_B64_1: ${{ secrets.NAUKRI_RESUME_B64_1 }}
+          NAUKRI_RESUME_B64_2: ${{ secrets.NAUKRI_RESUME_B64_2 }}
+          NAUKRI_RESUME_B64_3: ${{ secrets.NAUKRI_RESUME_B64_3 }}
+        run: |
+          set -eu
+          test -n "$NAUKRI_STATE_B64"
+          test -n "$NAUKRI_RESUME_B64_1"
+          test -n "$NAUKRI_RESUME_B64_2"
+          test -n "$NAUKRI_RESUME_B64_3"
+          mkdir -p state resumes
+          printf '%s' "$NAUKRI_STATE_B64" | base64 --decode > state/naukri-storage-state.json
+          printf '%s%s%s' "$NAUKRI_RESUME_B64_1" "$NAUKRI_RESUME_B64_2" "$NAUKRI_RESUME_B64_3" | base64 --decode > resumes/resume.pdf
+          chmod 600 state/naukri-storage-state.json resumes/resume.pdf
+
+      - name: Upload resume
+        run: xvfb-run -a npm run update

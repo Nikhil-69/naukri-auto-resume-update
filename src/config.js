@@ -11,6 +11,7 @@ const statePath = path.resolve(
 const resumePath = path.resolve(rootDir, process.env.RESUME_PATH || 'resumes/resume.pdf');
 const headless = process.env.HEADLESS !== 'false';
 const browserChannel = process.env.BROWSER_CHANNEL || 'chrome';
+const browserExecutablePath = process.env.BROWSER_EXECUTABLE_PATH || null;
 
 function requireResume() {
   if (!fs.existsSync(resumePath)) {
@@ -24,4 +25,4 @@ function requireState() {
   }
 }
 
-module.exports = { rootDir, statePath, resumePath, headless, browserChannel, requireResume, requireState };
+module.exports = { rootDir, statePath, resumePath, headless, browserChannel, browserExecutablePath, requireResume, requireState };

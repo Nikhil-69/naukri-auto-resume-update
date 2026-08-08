@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { chromium } = require('playwright');
-const { rootDir, statePath, resumePath, headless, browserChannel, requireResume, requireState } = require('./config');
+const { rootDir, statePath, resumePath, headless, browserChannel, browserExecutablePath, requireResume, requireState } = require('./config');
 
 const profileUrl = 'https://www.naukri.com/mnjuser/profile';
 const uploadUrlPattern = /(advresume|resume|cv)/i;
@@ -34,7 +34,10 @@ async function profileUpdateStatus(page) {
 async function main() {
   requireResume();
   requireState();
-  const browser = await chromium.launch({ headless, channel: browserChannel });
+  const browser = await chromium.launch({
+    headless,
+    ...(browserExecutablePath ? { executablePath: browserExecutablePath } : { channel: browserChannel }),
+  });
   const context = await browser.newContext({ storageState: statePath });
   const page = await context.newPage();
 

@@ -51,3 +51,7 @@ Use absolute paths and log output so failures are visible:
 ```
 
 The command exits non-zero when the resume is missing, the login state expired, the file input changed, or Naukri does not confirm the upload. Cron therefore does not report a false success.
+
+## GitHub Actions
+
+The public repository includes a scheduled workflow that runs daily at 09:30, 13:30, and 17:30 IST and can also be started manually. It needs these repository secrets, which must never be committed: `NAUKRI_STATE_B64`, `NAUKRI_RESUME_B64_1`, `NAUKRI_RESUME_B64_2`, and `NAUKRI_RESUME_B64_3`.
