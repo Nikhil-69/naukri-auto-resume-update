@@ -31,6 +31,15 @@ sudo apt-get update && sudo apt-get install -y google-chrome-stable xvfb
 npm run update:server
 ```
 
+To make the saved browser state much smaller before moving it to AWS, create a cookie-only Naukri state file and test it locally first:
+
+```bash
+npm run minimize-state
+NAUKRI_STATE_PATH=state/naukri-storage-state.min.json npm run update:server
+```
+
+If that test succeeds, move `state/naukri-storage-state.min.json` to AWS and set `NAUKRI_STATE_PATH=state/naukri-storage-state.min.json` in `.env`. The minimized file remains an authenticated secret and must never be committed.
+
 Naukri currently blocks its profile page in headless Chromium, so `.env` intentionally uses regular Google Chrome in headed mode. `xvfb-run` provides the virtual display required by cron. Inspect the screenshot path printed by any failure.
 
 ## Cron

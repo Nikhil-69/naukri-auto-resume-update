@@ -5,6 +5,7 @@
   "description": "Update a Naukri profile resume with a saved Playwright session",
   "scripts": {
     "login": "node src/login.js",
+    "minimize-state": "node src/minimize-state.js",
     "update": "node src/update-resume.js",
     "update:server": "xvfb-run -a node src/update-resume.js"
   },
