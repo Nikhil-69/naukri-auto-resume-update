@@ -26,12 +26,10 @@ jobs:
           node-version: 22
           cache: npm
 
-      - id: chrome
-        uses: browser-actions/setup-chrome@v1
-        with:
-          chrome-version: stable
-
       - run: npm ci
+
+      - name: Verify installed Google Chrome
+        run: google-chrome --version
 
       - name: Restore private Naukri files
         env:
@@ -52,5 +50,5 @@ jobs:
 
       - name: Upload resume
         env:
-          BROWSER_EXECUTABLE_PATH: ${{ steps.chrome.outputs.chrome-path }}
+          BROWSER_EXECUTABLE_PATH: /usr/bin/google-chrome
         run: xvfb-run -a npm run update
